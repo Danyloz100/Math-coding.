@@ -16,6 +16,9 @@ public class Main {
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(System.in));
 
+        System.out.println("Lab3 - 1\n" +
+                "Lab1 - 2\n");
+
         String menu = reader.readLine();
         switch (menu) {
             case "1":
