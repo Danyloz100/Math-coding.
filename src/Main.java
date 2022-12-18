@@ -8,8 +8,11 @@ import javax.crypto.spec.IvParameterSpec;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
+import java.util.Random;
+import java.util.Scanner;
 
 public class Main {
     static char[][] table = {{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'},
@@ -29,7 +32,8 @@ public class Main {
                 "Lab1 - 2\n" +
                 "Lab9 - 3\n" +
                 "Lab7 - 4\n" +
-                "Lab10 - 5\n");
+                "Lab10 - 5\n" +
+                "Lab8 - 6\n");
 
         String menu = reader.readLine();
         switch (menu) {
@@ -39,16 +43,75 @@ public class Main {
             case "2":
                 lab1(reader);
                 break;
-            case"3":
+            case "3":
                 lab9(reader);
                 break;
-            case"4":
+            case "4":
                 lab7();
                 break;
-            case"5":
+            case "5":
                 lab10();
                 break;
+            case "6":
+                lab8(reader);
+                break;
         }
+    }
+
+    private static void lab8(BufferedReader reader) throws IOException {
+        long P, G, x, a, y, bi, ka, kb;
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Both the users should be agreed upon the public keys G and P");
+        System.out.println("Enter value for public key G:");
+        G = scanner.nextLong();
+        System.out.println("Enter value for public key P:");
+        P = scanner.nextLong();
+        System.out.println("Enter value for private key a selected by user1:");
+        a = scanner.nextLong();
+        System.out.println("Enter value for private key b selected by user2:");
+        bi = scanner.nextLong();
+        x = DiffieHellman.calculatePower(G, a, P);
+        y = DiffieHellman.calculatePower(G, bi, P);
+        ka = DiffieHellman.calculatePower(y, a, P);
+        kb = DiffieHellman.calculatePower(x, bi, P);
+        System.out.println("Secret key for User1 is:" + ka);
+        System.out.println("Secret key for User2 is:" + kb);
+        BigInteger p, b, c, secretKey;
+        Random sc = new SecureRandom();
+        secretKey = new BigInteger(String.valueOf(ka));
+        //
+        // public key calculation
+        //
+        System.out.println("secretKey = " + secretKey);
+        p = BigInteger.probablePrime(64, sc);
+        b = new BigInteger("3");
+        c = b.modPow(secretKey, p);
+        System.out.println("p = " + p);
+        System.out.println("b = " + b);
+        System.out.println("c = " + c);
+        //
+        // Encryption
+        //
+        System.out.print("Enter your Big Number message -->");
+        String s = reader.readLine();
+        BigInteger X = new BigInteger(s);
+        BigInteger r = new BigInteger(64, sc);
+        BigInteger EC = X.multiply(c.modPow(r, p)).mod(p);
+        BigInteger brmodp = b.modPow(r, p);
+        System.out.println("Plaintext = " + X);
+        System.out.println("r = " + r);
+        System.out.println("EC = " + EC);
+        System.out.println("b^r mod p = " + brmodp);
+        //
+        // Decryption
+        //
+        BigInteger crmodp = brmodp.modPow(secretKey, p);
+        BigInteger d = crmodp.modInverse(p);
+        BigInteger ad = d.multiply(EC).mod(p);
+        System.out.println("\n\nc^r mod p = " + crmodp);
+        System.out.println("d = " + d);
+        System.out.println("Alice decodes: " + ad);
+
     }
 
     private static void lab10() throws Exception {
