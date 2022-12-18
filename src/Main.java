@@ -1,3 +1,5 @@
+import jakarta.xml.bind.DatatypeConverter;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
@@ -7,11 +9,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
+import java.security.*;
 
 public class Main {
     static char[][] table = {{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'},
@@ -23,16 +21,15 @@ public class Main {
             {'W', 'X', 'Y', 'Z', '0', '1', '2', '3'},
             {'4', '5', '6', '7', '8', '9', ' ', ','}};
 
-    public static void main(String[] args) throws IOException, NoSuchAlgorithmException,
-            InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException,
-            InvalidKeyException {
+    public static void main(String[] args) throws Exception {
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(System.in));
 
         System.out.println("Lab3 - 1\n" +
                 "Lab1 - 2\n" +
                 "Lab9 - 3\n" +
-                "Lab7 - 4\n");
+                "Lab7 - 4\n" +
+                "Lab10 - 5\n");
 
         String menu = reader.readLine();
         switch (menu) {
@@ -48,7 +45,23 @@ public class Main {
             case"4":
                 lab7();
                 break;
+            case"5":
+                lab10();
+                break;
         }
+    }
+
+    private static void lab10() throws Exception {
+        String input = "HELLO WORLD";
+        KeyPair keyPair = DSA.Generate_RSA_KeyPair();
+
+        byte[] signature
+                = DSA.Create_Digital_Signature(
+                input.getBytes(),
+                keyPair.getPrivate());
+        System.out.println("Signature Value:\n " + DatatypeConverter.printHexBinary(signature));
+        System.out.println("Verification: " +
+                DSA.Verify_Digital_Signature(input.getBytes(), signature, keyPair.getPublic()));
     }
 
     private static void lab7() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
