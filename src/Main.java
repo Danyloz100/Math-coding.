@@ -1,6 +1,17 @@
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 public class Main {
     static char[][] table = {{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'},
@@ -12,12 +23,16 @@ public class Main {
             {'W', 'X', 'Y', 'Z', '0', '1', '2', '3'},
             {'4', '5', '6', '7', '8', '9', ' ', ','}};
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException,
+            InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException,
+            InvalidKeyException {
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(System.in));
 
         System.out.println("Lab3 - 1\n" +
-                "Lab1 - 2\n");
+                "Lab1 - 2\n" +
+                "Lab9 - 3\n" +
+                "Lab7 - 4\n");
 
         String menu = reader.readLine();
         switch (menu) {
@@ -27,7 +42,44 @@ public class Main {
             case "2":
                 lab1(reader);
                 break;
+            case"3":
+                lab9(reader);
+                break;
+            case"4":
+                lab7();
+                break;
         }
+    }
+
+    private static void lab7() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        String input = "Hello World";
+        SecretKey key = AES.generateKey(128);
+        IvParameterSpec ivParameterSpec = AES.generateIv();
+        String algorithm = "AES/CBC/PKCS5Padding";
+        String cipherText = AES.encrypt(algorithm, input, key, ivParameterSpec);
+        System.out.println("Зашифрування: " + cipherText + "\n");
+        String plainText = AES.decrypt(algorithm, cipherText, key, ivParameterSpec);
+        System.out.println("Розшифрування: " + plainText);
+        System.out.println();
+    }
+
+    private static void lab9(BufferedReader reader) throws IOException, NoSuchAlgorithmException {
+        String input = reader.readLine();
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] encodedhash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+        System.out.println(bytesToHex(encodedhash));
+    }
+
+    private static String bytesToHex(byte[] hash) {
+        StringBuilder hexString = new StringBuilder(2 * hash.length);
+        for (int i = 0; i < hash.length; i++) {
+            String hex = Integer.toHexString(0xff & hash[i]);
+            if(hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
     }
 
     private static void lab3() {
