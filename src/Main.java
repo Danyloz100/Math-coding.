@@ -139,23 +139,9 @@ public class Main {
         System.out.println();
     }
 
-    private static void lab9(BufferedReader reader) throws IOException, NoSuchAlgorithmException {
+    private static void lab9(BufferedReader reader) throws IOException {
         String input = reader.readLine();
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] encodedhash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
-        System.out.println(bytesToHex(encodedhash));
-    }
-
-    private static String bytesToHex(byte[] hash) {
-        StringBuilder hexString = new StringBuilder(2 * hash.length);
-        for (int i = 0; i < hash.length; i++) {
-            String hex = Integer.toHexString(0xff & hash[i]);
-            if(hex.length() == 1) {
-                hexString.append('0');
-            }
-            hexString.append(hex);
-        }
-        return hexString.toString();
+        System.out.println("0x" + MD5.toHexString(MD5.computeMD5(input.getBytes())) + " <== \"" + input + "\"");
     }
 
     private static void lab3() {
