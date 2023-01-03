@@ -1,15 +1,5 @@
-import jakarta.xml.bind.DatatypeConverter;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.Random;
 import java.util.Scanner;
@@ -47,12 +37,9 @@ public class Main {
                 lab9(reader);
                 break;
             case "4":
-                lab7();
-                break;
-            case "5":
                 lab10();
                 break;
-            case "6":
+            case "5":
                 lab8(reader);
                 break;
         }
@@ -114,29 +101,36 @@ public class Main {
 
     }
 
-    private static void lab10() throws Exception {
-        String input = "HELLO WORLD";
-        KeyPair keyPair = DSA.Generate_RSA_KeyPair();
-
-        byte[] signature
-                = DSA.Create_Digital_Signature(
-                input.getBytes(),
-                keyPair.getPrivate());
-        System.out.println("Signature Value:\n " + DatatypeConverter.printHexBinary(signature));
-        System.out.println("Verification: " +
-                DSA.Verify_Digital_Signature(input.getBytes(), signature, keyPair.getPublic()));
-    }
-
-    private static void lab7() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        String input = "Hello World";
-        SecretKey key = AES.generateKey(128);
-        IvParameterSpec ivParameterSpec = AES.generateIv();
-        String algorithm = "AES/CBC/PKCS5Padding";
-        String cipherText = AES.encrypt(algorithm, input, key, ivParameterSpec);
-        System.out.println("Зашифрування: " + cipherText + "\n");
-        String plainText = AES.decrypt(algorithm, cipherText, key, ivParameterSpec);
-        System.out.println("Розшифрування: " + plainText);
-        System.out.println();
+    private static void lab10(){
+        String msg = "9876543210987654321";
+        BigInteger p, b, c, secretKey;
+        Random sc = new SecureRandom();
+        secretKey = new BigInteger("12345678901234567890");
+        System.out.println("secretKey = " + secretKey);
+        p = BigInteger.probablePrime(64, sc);
+        b = new BigInteger("3");
+        c = b.modPow(secretKey, p);
+        System.out.println("p = " + p);
+        System.out.println("b = " + b);
+        System.out.println("c = " + c);
+        System.out.print("Enter your Big Number message --> ");
+        String s = msg;
+        BigInteger X = new BigInteger(s);
+        BigInteger r = new BigInteger(64, sc);
+        BigInteger EC = X.multiply(c.modPow(r, p)).mod(p);
+        BigInteger brmodp = b.modPow(r, p);
+        System.out.println("Plaintext = " + X);
+        System.out.println("\nEncryption");
+        System.out.println("r = " + r);
+        System.out.println("EC = " + EC);
+        System.out.println("b^r mod p = " + brmodp);
+        System.out.println("\nDecryption");
+        BigInteger crmodp = brmodp.modPow(secretKey, p);
+        BigInteger d = crmodp.modInverse(p);
+        BigInteger ad = d.multiply(EC).mod(p);
+        System.out.println("c^r mod p = " + crmodp);
+        System.out.println("d = " + d);
+        System.out.println("Alice decodes: " + ad);
     }
 
     private static void lab9(BufferedReader reader) throws IOException {

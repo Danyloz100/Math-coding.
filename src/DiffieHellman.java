@@ -1,4 +1,3 @@
-import java.util.Scanner;
 
 public class DiffieHellman {
     static long calculatePower(long x, long y, long P)
