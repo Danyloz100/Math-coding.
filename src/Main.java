@@ -1,10 +1,13 @@
 import java.io.*;
 import java.math.BigInteger;
-import java.security.*;
+import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
 public class Main {
+    private static AES cipher;
     static char[][] table = {{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'},
             {'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p'},
             {'q', 'r', 's', 't', 'u', 'v', 'w', 'x'},
@@ -21,9 +24,9 @@ public class Main {
         System.out.println("Lab3 - 1\n" +
                 "Lab1 - 2\n" +
                 "Lab9 - 3\n" +
-                "Lab7 - 4\n" +
-                "Lab10 - 5\n" +
-                "Lab8 - 6\n");
+                "Lab7 - 6\n" +
+                "Lab10 - 4\n" +
+                "Lab8 - 5\n");
 
         String menu = reader.readLine();
         switch (menu) {
@@ -42,7 +45,61 @@ public class Main {
             case "5":
                 lab8(reader);
                 break;
+            case "6":
+                lab7(reader);
+                break;
         }
+    }
+
+    private static void lab7(BufferedReader reader) throws IOException {
+        System.out.println("Please, pass the text");
+
+        String text = reader.readLine();
+        byte[] key = getKey();
+
+        text = fillBlock(text);
+        byte[] inputText = text.getBytes();
+
+        System.out.println("\n~~~ mainTest ~~~\n");
+
+        cipher = new AES(key);
+
+        double startTime = System.currentTimeMillis();
+        byte[] bytes = new byte[0];
+        byte[] bytes1 = new byte[0];
+        for (int i=0; i < 100000; i++){
+            bytes = cipher.ECB_encrypt(inputText);
+            bytes1 = cipher.ECB_decrypt(bytes);
+        }
+        System.out.println(bytes);
+        System.out.println(new String(bytes1, StandardCharsets.UTF_8));
+        double endTime = System.currentTimeMillis();
+        System.out.println("ECB | "+(endTime-startTime)/1000.0 + " secs");
+
+        byte[] iv = "c8IKDNGsbioSCfxWa6KT8A84SrlMwOUH".getBytes();
+        cipher = new AES(key, iv);
+
+        double startTimeCBC = System.currentTimeMillis();
+        for (int i=0; i < 100000; i++){
+            bytes = cipher.CBC_encrypt(inputText);
+            bytes1 = cipher.CBC_decrypt(bytes);
+        }
+        System.out.println(bytes);
+        System.out.println(new String(bytes1, StandardCharsets.UTF_8));
+        double endTimeCBC = System.currentTimeMillis();
+        System.out.println("CBC | "+(endTimeCBC-startTimeCBC)/1000.0 + " secs");
+    }
+
+    private static String fillBlock(String text) {
+        int spaceNum = text.getBytes().length%16==0?0:16-text.getBytes().length%16;
+        for (int i = 0; i<spaceNum; i++) text += " ";
+        return text;
+    }
+
+    private static byte[] getKey() {
+        String key = "";
+        for (int i=0; i < 2; i++) key += Long.toHexString(Double.doubleToLongBits(Math.random()));
+        return key.getBytes();
     }
 
     private static void lab8(BufferedReader reader) throws IOException {
@@ -191,4 +248,5 @@ public class Main {
             throw new RuntimeException("Довжина уведеного тексту має ділитись на 2");
         }
     }
+
 }
